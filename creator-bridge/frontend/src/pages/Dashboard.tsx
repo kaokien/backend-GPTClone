@@ -1,205 +1,262 @@
 import React from 'react';
 
 const Dashboard: React.FC = () => {
+  const navStyle: React.CSSProperties = {
+    background: 'white',
+    borderBottom: '1px solid #e5e7eb',
+    padding: '0 20px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: '64px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+  };
+
+  const logoStyle: React.CSSProperties = {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#1f2937'
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
       {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <h1 className="text-xl font-bold text-gray-900">🌉 Creator Bridge</h1>
-              </div>
-              <div className="hidden md:ml-8 md:flex md:space-x-8">
-                <a href="#" className="text-blue-600 border-b-2 border-blue-600 px-1 pt-1 text-sm font-medium">
-                  Dashboard
-                </a>
-                <a href="#" className="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">
-                  Platforms
-                </a>
-                <a href="#" className="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">
-                  Content
-                </a>
-                <a href="#" className="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">
-                  Sync
-                </a>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
-                Connect Platform
-              </button>
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-            </div>
-          </div>
+      <nav style={navStyle}>
+        <div>
+          <h1 style={logoStyle}>🌉 Creator Bridge</h1>
+        </div>
+        <div>
+          <button className="btn">
+            Connect Platform
+          </button>
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div className="container">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Content</p>
-                <p className="text-2xl font-bold text-gray-900">156</p>
-              </div>
-            </div>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-label">Total Content</div>
+            <div className="stat-number">156</div>
+            <p style={{ color: '#6b7280', fontSize: '14px' }}>Videos imported</p>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Synced</p>
-                <p className="text-2xl font-bold text-gray-900">89</p>
-              </div>
-            </div>
+          <div className="stat-card">
+            <div className="stat-label">Synced</div>
+            <div className="stat-number">89</div>
+            <p style={{ color: '#6b7280', fontSize: '14px' }}>Successfully deployed</p>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Processing</p>
-                <p className="text-2xl font-bold text-gray-900">12</p>
-              </div>
-            </div>
+          <div className="stat-card">
+            <div className="stat-label">Processing</div>
+            <div className="stat-number">12</div>
+            <p style={{ color: '#6b7280', fontSize: '14px' }}>Currently processing</p>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
+          <div className="stat-card">
+            <div className="stat-label">Platforms</div>
+            <div className="stat-number">3</div>
+            <p style={{ color: '#6b7280', fontSize: '14px' }}>Connected accounts</p>
+          </div>
+        </div>
+
+        {/* Welcome Section */}
+        <div className="card">
+          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <h1 style={{ fontSize: '2.5em', fontWeight: 'bold', color: '#1f2937', marginBottom: '16px' }}>
+              Welcome to Creator Content Bridge
+            </h1>
+            <p style={{ fontSize: '1.2em', color: '#6b7280', marginBottom: '40px' }}>
+              Your B2B SaaS solution for migrating social media content to owned platforms
+            </p>
+            
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+              gap: '30px', 
+              maxWidth: '800px', 
+              margin: '0 auto' 
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ 
+                  width: '64px', 
+                  height: '64px', 
+                  backgroundColor: '#dbeafe', 
+                  borderRadius: '8px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  margin: '0 auto 16px',
+                  fontSize: '24px'
+                }}>
+                  🔗
+                </div>
+                <h3 style={{ fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>Connect Platforms</h3>
+                <p style={{ fontSize: '14px', color: '#6b7280' }}>Link Instagram & TikTok accounts</p>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Platforms</p>
-                <p className="text-2xl font-bold text-gray-900">3</p>
+              
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ 
+                  width: '64px', 
+                  height: '64px', 
+                  backgroundColor: '#dcfce7', 
+                  borderRadius: '8px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  margin: '0 auto 16px',
+                  fontSize: '24px'
+                }}>
+                  📥
+                </div>
+                <h3 style={{ fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>Import Content</h3>
+                <p style={{ fontSize: '14px', color: '#6b7280' }}>Extract videos & metadata</p>
+              </div>
+              
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ 
+                  width: '64px', 
+                  height: '64px', 
+                  backgroundColor: '#ede9fe', 
+                  borderRadius: '8px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  margin: '0 auto 16px',
+                  fontSize: '24px'
+                }}>
+                  ✏️
+                </div>
+                <h3 style={{ fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>Edit & Stage</h3>
+                <p style={{ fontSize: '14px', color: '#6b7280' }}>Optimize for SEO & branding</p>
+              </div>
+              
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ 
+                  width: '64px', 
+                  height: '64px', 
+                  backgroundColor: '#fef3c7', 
+                  borderRadius: '8px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  margin: '0 auto 16px',
+                  fontSize: '24px'
+                }}>
+                  🚀
+                </div>
+                <h3 style={{ fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>Deploy to CMS</h3>
+                <p style={{ fontSize: '14px', color: '#6b7280' }}>Sync to JW Player & more</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Platform Connections */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Connected Platforms</h2>
+        <div className="card">
+          <h2 style={{ fontSize: '1.5em', fontWeight: '600', color: '#1f2937', marginBottom: '20px' }}>
+            Connected Platforms
+          </h2>
+          
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ 
+                width: '40px', 
+                height: '40px', 
+                background: 'linear-gradient(45deg, #8b5cf6, #ec4899)', 
+                borderRadius: '8px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                color: 'white', 
+                fontWeight: 'bold',
+                marginRight: '16px'
+              }}>
+                IG
+              </div>
+              <div>
+                <p style={{ fontWeight: '500', color: '#1f2937', margin: '0 0 4px 0' }}>@creative_agency</p>
+                <p style={{ fontSize: '14px', color: '#6b7280', margin: '0' }}>Instagram • Connected</p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ 
+                padding: '4px 8px', 
+                fontSize: '12px', 
+                fontWeight: '500', 
+                backgroundColor: '#dcfce7', 
+                color: '#166534', 
+                borderRadius: '12px' 
+              }}>
+                Auto-sync ON
+              </span>
+              <button style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer' }}>
+                ⚙️
+              </button>
+            </div>
           </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold">IG</span>
-                  </div>
-                  <div className="ml-4">
-                    <p className="font-medium text-gray-900">@creative_agency</p>
-                    <p className="text-sm text-gray-500">Instagram • Connected</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                    Auto-sync ON
-                  </span>
-                  <button className="text-gray-400 hover:text-gray-600">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </button>
-                </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ 
+                width: '40px', 
+                height: '40px', 
+                backgroundColor: 'black', 
+                borderRadius: '8px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                color: 'white', 
+                fontWeight: 'bold',
+                marginRight: '16px'
+              }}>
+                T
               </div>
-              
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">T</span>
-                  </div>
-                  <div className="ml-4">
-                    <p className="font-medium text-gray-900">@viral_content</p>
-                    <p className="text-sm text-gray-500">TikTok • Connected</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">
-                    Auto-sync OFF
-                  </span>
-                  <button className="text-gray-400 hover:text-gray-600">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </button>
-                </div>
+              <div>
+                <p style={{ fontWeight: '500', color: '#1f2937', margin: '0 0 4px 0' }}>@viral_content</p>
+                <p style={{ fontSize: '14px', color: '#6b7280', margin: '0' }}>TikTok • Connected</p>
               </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ 
+                padding: '4px 8px', 
+                fontSize: '12px', 
+                fontWeight: '500', 
+                backgroundColor: '#f3f4f6', 
+                color: '#1f2937', 
+                borderRadius: '12px' 
+              }}>
+                Auto-sync OFF
+              </span>
+              <button style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer' }}>
+                ⚙️
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Welcome Message */}
-        <div className="text-center py-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to Creator Content Bridge
-          </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Your B2B SaaS solution for migrating social media content to owned platforms
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-gray-900">Connect Platforms</h3>
-              <p className="text-sm text-gray-500">Link Instagram & TikTok accounts</p>
+        {/* Demo Features */}
+        <div className="card">
+          <h2 style={{ fontSize: '1.5em', fontWeight: '600', color: '#1f2937', marginBottom: '20px' }}>
+            Demo Features
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+            <div>
+              <h3 style={{ color: '#2563eb', marginBottom: '8px' }}>🔐 OAuth Integration</h3>
+              <p style={{ color: '#6b7280', fontSize: '14px' }}>Secure Instagram and TikTok account connections with proper token management.</p>
             </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-gray-900">Import Content</h3>
-              <p className="text-sm text-gray-500">Extract videos & metadata</p>
+            <div>
+              <h3 style={{ color: '#059669', marginBottom: '8px' }}>📥 Content Extraction</h3>
+              <p style={{ color: '#6b7280', fontSize: '14px' }}>Automatic video download with metadata including captions, hashtags, and stats.</p>
             </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-gray-900">Edit & Stage</h3>
-              <p className="text-sm text-gray-500">Optimize for SEO & branding</p>
+            <div>
+              <h3 style={{ color: '#7c3aed', marginBottom: '8px' }}>✏️ Metadata Editor</h3>
+              <p style={{ color: '#6b7280', fontSize: '14px' }}>Edit titles, descriptions, and tags for SEO optimization before publishing.</p>
             </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-gray-900">Deploy to CMS</h3>
-              <p className="text-sm text-gray-500">Sync to JW Player & more</p>
+            <div>
+              <h3 style={{ color: '#dc2626', marginBottom: '8px' }}>🚀 CMS Deployment</h3>
+              <p style={{ color: '#6b7280', fontSize: '14px' }}>Seamless sync to JW Player and other video platforms with status tracking.</p>
             </div>
           </div>
         </div>
