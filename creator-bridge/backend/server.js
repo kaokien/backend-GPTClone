@@ -3,27 +3,53 @@ const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 const rateLimit = require('express-rate-limit');
+const fs = require('fs-extra');
+const path = require('path');
 
 // Load environment variables from .env file
 dotenv.config();
+
+// Initialize services
+const InstagramService = require('./services/instagramService');
+const JWPlayerService = require('./services/jwPlayerService');
+
+const instagramService = new InstagramService();
+const jwPlayerService = new JWPlayerService();
 
 // Initialize express app
 const app = express();
 
 // --- Middlewares ---
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'],
+  credentials: true
+}));
 app.use(helmet());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
   standardHeaders: true,
   legacyHeaders: false,
 });
 app.use(limiter);
 
-// --- In-Memory Database (for demo purposes) ---
+// Ensure directories exist
+const ensureDirectories = async () => {
+  const dirs = [
+    process.env.TEMP_DIR || './temp',
+    process.env.PROCESSED_DIR || './processed',
+    './logs'
+  ];
+  
+  for (const dir of dirs) {
+    await fs.ensureDir(dir);
+  }
+};
+
+// --- In-Memory Database (for demo - replace with MongoDB in production) ---
 let appData = {
   stats: {
     totalContent: 0,
@@ -37,6 +63,7 @@ let appData = {
       name: 'Instagram',
       connected: false,
       username: '',
+      accessToken: '',
       autoSync: false,
       lastSync: null
     },
@@ -45,6 +72,7 @@ let appData = {
       name: 'TikTok',
       connected: false,
       username: '',
+      accessToken: '',
       autoSync: false,
       lastSync: null
     }
@@ -54,26 +82,6 @@ let appData = {
 };
 
 // --- Helper Functions ---
-const generateMockContent = (platformId, count = 1) => {
-  const content = [];
-  for (let i = 0; i < count; i++) {
-    content.push({
-      id: `${platformId}_${Date.now()}_${i}`,
-      platform: platformId,
-      title: `${platformId} Video ${i + 1}`,
-      description: `This is a sample video imported from ${platformId}`,
-      thumbnail: `https://picsum.photos/300/200?random=${Date.now() + i}`,
-      status: 'imported',
-      views: Math.floor(Math.random() * 10000),
-      likes: Math.floor(Math.random() * 1000),
-      hashtags: ['#content', '#video', `#${platformId}`],
-      createdAt: new Date().toISOString(),
-      importedAt: new Date().toISOString()
-    });
-  }
-  return content;
-};
-
 const updateStats = () => {
   appData.stats = {
     totalContent: appData.content.length,
@@ -90,16 +98,19 @@ app.get('/', (req, res) => {
   res.status(200).json({ 
     status: 'ok', 
     message: 'Creator Bridge API is running.',
-    version: '1.0.0',
+    version: '2.0.0',
+    environment: process.env.NODE_ENV || 'development',
     endpoints: [
       'GET /api/stats',
       'GET /api/platforms',
-      'POST /api/platforms/:id/connect',
+      'GET /auth/instagram',
+      'GET /auth/instagram/callback',
       'POST /api/platforms/:id/disconnect',
       'GET /api/content',
-      'POST /api/content/import',
+      'POST /api/content/import/:platformId',
       'POST /api/content/:id/sync',
-      'GET /api/sync/status'
+      'GET /api/sync/status',
+      'POST /api/test/connections'
     ]
   });
 });
@@ -107,42 +118,82 @@ app.get('/', (req, res) => {
 // Get dashboard statistics
 app.get('/api/stats', (req, res) => {
   updateStats();
-  res.json(appData.stats);
+  res.json({
+    ...appData.stats,
+    lastUpdated: new Date().toISOString()
+  });
 });
 
 // Get platform connections
 app.get('/api/platforms', (req, res) => {
-  res.json(appData.platforms);
+  // Don't expose access tokens in the response
+  const platforms = appData.platforms.map(p => ({
+    id: p.id,
+    name: p.name,
+    connected: p.connected,
+    username: p.username,
+    autoSync: p.autoSync,
+    lastSync: p.lastSync
+  }));
+  
+  res.json(platforms);
 });
 
-// Connect to a platform
-app.post('/api/platforms/:id/connect', (req, res) => {
-  const { id } = req.params;
-  const { username, accessToken } = req.body;
-  
-  const platform = appData.platforms.find(p => p.id === id);
-  if (!platform) {
-    return res.status(404).json({ error: 'Platform not found' });
+// Instagram OAuth Routes
+app.get('/auth/instagram', (req, res) => {
+  try {
+    const authUrl = instagramService.getAuthorizationUrl();
+    res.redirect(authUrl);
+  } catch (error) {
+    console.error('Instagram auth error:', error.message);
+    res.status(500).json({ 
+      error: 'Failed to initiate Instagram authentication',
+      message: error.message 
+    });
   }
-  
-  // Simulate OAuth connection
-  platform.connected = true;
-  platform.username = username || `@demo_${id}`;
-  platform.autoSync = true;
-  platform.lastSync = new Date().toISOString();
-  
-  // Generate some mock content for the newly connected platform
-  const mockContent = generateMockContent(id, Math.floor(Math.random() * 5) + 1);
-  appData.content.push(...mockContent);
-  
-  updateStats();
-  
-  res.json({
-    success: true,
-    message: `Successfully connected to ${platform.name}`,
-    platform: platform,
-    importedContent: mockContent.length
-  });
+});
+
+app.get('/auth/instagram/callback', async (req, res) => {
+  try {
+    const { code, error, error_description } = req.query;
+    
+    if (error) {
+      return res.redirect(`${process.env.FRONTEND_URL}?error=${encodeURIComponent(error_description || error)}`);
+    }
+    
+    if (!code) {
+      return res.redirect(`${process.env.FRONTEND_URL}?error=No authorization code received`);
+    }
+    
+    console.log('Exchanging Instagram authorization code for access token...');
+    
+    // Exchange code for access token
+    const tokenData = await instagramService.exchangeCodeForToken(code);
+    
+    // Get user profile
+    const profile = await instagramService.getUserProfile(tokenData.access_token);
+    
+    // Update platform connection
+    const platform = appData.platforms.find(p => p.id === 'instagram');
+    if (platform) {
+      platform.connected = true;
+      platform.username = `@${profile.username}`;
+      platform.accessToken = tokenData.access_token;
+      platform.autoSync = true;
+      platform.lastSync = new Date().toISOString();
+    }
+    
+    updateStats();
+    
+    console.log(`Instagram connected successfully: ${profile.username}`);
+    
+    // Redirect to frontend with success
+    res.redirect(`${process.env.FRONTEND_URL}?platform=instagram&status=connected&username=${profile.username}`);
+    
+  } catch (error) {
+    console.error('Instagram callback error:', error.message);
+    res.redirect(`${process.env.FRONTEND_URL}?error=${encodeURIComponent(error.message)}`);
+  }
 });
 
 // Disconnect from a platform
@@ -156,6 +207,7 @@ app.post('/api/platforms/:id/disconnect', (req, res) => {
   
   platform.connected = false;
   platform.username = '';
+  platform.accessToken = '';
   platform.autoSync = false;
   platform.lastSync = null;
   
@@ -164,7 +216,11 @@ app.post('/api/platforms/:id/disconnect', (req, res) => {
   res.json({
     success: true,
     message: `Disconnected from ${platform.name}`,
-    platform: platform
+    platform: {
+      id: platform.id,
+      name: platform.name,
+      connected: platform.connected
+    }
   });
 });
 
@@ -186,7 +242,11 @@ app.post('/api/platforms/:id/toggle-sync', (req, res) => {
   res.json({
     success: true,
     message: `Auto-sync ${platform.autoSync ? 'enabled' : 'disabled'} for ${platform.name}`,
-    platform: platform
+    platform: {
+      id: platform.id,
+      name: platform.name,
+      autoSync: platform.autoSync
+    }
   });
 });
 
@@ -220,81 +280,174 @@ app.get('/api/content', (req, res) => {
 });
 
 // Import content from a platform
-app.post('/api/content/import', (req, res) => {
-  const { platformId, count = 1 } = req.body;
+app.post('/api/content/import/:platformId', async (req, res) => {
+  const { platformId } = req.params;
+  const { count = 5 } = req.body;
   
-  const platform = appData.platforms.find(p => p.id === platformId);
-  if (!platform) {
-    return res.status(404).json({ error: 'Platform not found' });
+  try {
+    const platform = appData.platforms.find(p => p.id === platformId);
+    if (!platform) {
+      return res.status(404).json({ error: 'Platform not found' });
+    }
+    
+    if (!platform.connected || !platform.accessToken) {
+      return res.status(400).json({ 
+        error: 'Platform is not connected or missing access token',
+        requiresAuth: true,
+        authUrl: platformId === 'instagram' ? '/auth/instagram' : null
+      });
+    }
+    
+    console.log(`Starting import from ${platform.name}...`);
+    
+    if (platformId === 'instagram') {
+      // Import from Instagram using real API
+      const mediaData = await instagramService.getUserMedia(platform.accessToken, count);
+      const processedMedia = [];
+      
+      for (const media of mediaData.data) {
+        try {
+          if (['VIDEO', 'CAROUSEL_ALBUM'].includes(media.media_type)) {
+            console.log(`Processing Instagram media: ${media.id}`);
+            const processed = await instagramService.processMediaForImport(media, platform.accessToken);
+            
+            // Add to our content library
+            appData.content.push({
+              ...processed,
+              status: 'imported',
+              syncDestinations: []
+            });
+            
+            processedMedia.push(processed);
+          }
+        } catch (error) {
+          console.warn(`Skipping media ${media.id}:`, error.message);
+        }
+      }
+      
+      platform.lastSync = new Date().toISOString();
+      updateStats();
+      
+      res.json({
+        success: true,
+        message: `Imported ${processedMedia.length} videos from ${platform.name}`,
+        content: processedMedia,
+        stats: appData.stats
+      });
+      
+    } else {
+      // For other platforms, return error for now
+      res.status(400).json({ 
+        error: `Import not yet implemented for ${platform.name}` 
+      });
+    }
+    
+  } catch (error) {
+    console.error('Import error:', error.message);
+    res.status(500).json({ 
+      error: 'Failed to import content', 
+      message: error.message 
+    });
   }
-  
-  if (!platform.connected) {
-    return res.status(400).json({ error: 'Platform is not connected' });
-  }
-  
-  const newContent = generateMockContent(platformId, parseInt(count));
-  appData.content.push(...newContent);
-  
-  platform.lastSync = new Date().toISOString();
-  updateStats();
-  
-  res.json({
-    success: true,
-    message: `Imported ${newContent.length} content items from ${platform.name}`,
-    content: newContent,
-    stats: appData.stats
-  });
 });
 
 // Sync content to CMS
-app.post('/api/content/:id/sync', (req, res) => {
+app.post('/api/content/:id/sync', async (req, res) => {
   const { id } = req.params;
   const { destination = 'jwplayer' } = req.body;
   
-  const content = appData.content.find(c => c.id === id);
-  if (!content) {
-    return res.status(404).json({ error: 'Content not found' });
-  }
-  
-  if (content.status === 'synced') {
-    return res.status(400).json({ error: 'Content is already synced' });
-  }
-  
-  // Simulate sync process
-  content.status = 'processing';
-  
-  // Add to sync queue
-  appData.syncQueue.push({
-    contentId: id,
-    destination: destination,
-    startedAt: new Date().toISOString(),
-    status: 'processing'
-  });
-  
-  // Simulate async processing
-  setTimeout(() => {
-    content.status = 'synced';
-    content.syncedAt = new Date().toISOString();
-    content.syncedTo = destination;
-    
-    // Update sync queue
-    const queueItem = appData.syncQueue.find(q => q.contentId === id);
-    if (queueItem) {
-      queueItem.status = 'completed';
-      queueItem.completedAt = new Date().toISOString();
+  try {
+    const content = appData.content.find(c => c.id === id);
+    if (!content) {
+      return res.status(404).json({ error: 'Content not found' });
     }
     
+    if (content.status === 'synced') {
+      return res.status(400).json({ error: 'Content is already synced' });
+    }
+    
+    console.log(`Starting sync of "${content.title}" to ${destination}...`);
+    
+    // Update status to processing
+    content.status = 'processing';
+    
+    // Add to sync queue
+    const queueItem = {
+      contentId: id,
+      destination: destination,
+      startedAt: new Date().toISOString(),
+      status: 'processing'
+    };
+    appData.syncQueue.push(queueItem);
+    
     updateStats();
-  }, 2000); // 2 second delay to simulate processing
-  
-  updateStats();
-  
-  res.json({
-    success: true,
-    message: `Started syncing "${content.title}" to ${destination}`,
-    content: content,
-    queuePosition: appData.syncQueue.length
-  });
+    
+    // Start async processing
+    if (destination === 'jwplayer') {
+      // Use real JW Player API
+      jwPlayerService.processInstagramVideo(content)
+        .then(result => {
+          console.log(`Successfully synced to JW Player: ${result.id}`);
+          
+          // Update content status
+          content.status = 'synced';
+          content.syncedAt = new Date().toISOString();
+          content.syncedTo = destination;
+          content.jwPlayerData = result;
+          
+          // Update sync queue
+          queueItem.status = 'completed';
+          queueItem.completedAt = new Date().toISOString();
+          queueItem.result = result;
+          
+          updateStats();
+        })
+        .catch(error => {
+          console.error(`Failed to sync to JW Player:`, error.message);
+          
+          // Update content status
+          content.status = 'error';
+          content.errorMessage = error.message;
+          
+          // Update sync queue
+          queueItem.status = 'failed';
+          queueItem.completedAt = new Date().toISOString();
+          queueItem.error = error.message;
+          
+          updateStats();
+        });
+    } else {
+      // For other destinations, simulate processing
+      setTimeout(() => {
+        content.status = 'synced';
+        content.syncedAt = new Date().toISOString();
+        content.syncedTo = destination;
+        
+        queueItem.status = 'completed';
+        queueItem.completedAt = new Date().toISOString();
+        
+        updateStats();
+      }, 3000);
+    }
+    
+    res.json({
+      success: true,
+      message: `Started syncing "${content.title}" to ${destination}`,
+      content: {
+        id: content.id,
+        title: content.title,
+        status: content.status
+      },
+      queuePosition: appData.syncQueue.length
+    });
+    
+  } catch (error) {
+    console.error('Sync error:', error.message);
+    res.status(500).json({ 
+      error: 'Failed to start sync', 
+      message: error.message 
+    });
+  }
 });
 
 // Bulk sync content
@@ -364,10 +517,56 @@ app.get('/api/sync/status', (req, res) => {
     queue: {
       processing: processingQueue.length,
       completed: appData.syncQueue.filter(q => q.status === 'completed').length,
+      failed: appData.syncQueue.filter(q => q.status === 'failed').length,
       items: processingQueue
     },
     recentCompletions: recentCompletions,
     stats: appData.stats
+  });
+});
+
+// Test API connections
+app.post('/api/test/connections', async (req, res) => {
+  const results = {};
+  
+  // Test Instagram connection (if configured)
+  if (process.env.INSTAGRAM_APP_ID && process.env.INSTAGRAM_APP_SECRET) {
+    try {
+      const authUrl = instagramService.getAuthorizationUrl();
+      results.instagram = {
+        configured: true,
+        authUrl: authUrl,
+        message: 'Instagram API credentials configured'
+      };
+    } catch (error) {
+      results.instagram = {
+        configured: false,
+        error: error.message
+      };
+    }
+  } else {
+    results.instagram = {
+      configured: false,
+      message: 'Instagram API credentials not configured'
+    };
+  }
+  
+  // Test JW Player connection
+  try {
+    const jwTest = await jwPlayerService.testConnection();
+    results.jwplayer = jwTest;
+  } catch (error) {
+    results.jwplayer = {
+      success: false,
+      error: error.message,
+      message: 'JW Player API credentials not configured or invalid'
+    };
+  }
+  
+  res.json({
+    success: true,
+    connections: results,
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -449,30 +648,33 @@ app.use((req, res) => {
 // --- Server Initialization ---
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Creator Bridge API Server is running on port ${PORT}`);
-  console.log(`📊 Dashboard: http://localhost:${PORT}`);
-  console.log(`🔗 API Endpoints: http://localhost:${PORT}/api/`);
-  console.log(`🔥 Environment: ${process.env.NODE_ENV || 'development'}`);
-  
-  // Initialize with some sample data for demonstration
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('🎭 Loading demo data...');
+const startServer = async () => {
+  try {
+    // Ensure required directories exist
+    await ensureDirectories();
     
-    // Add some initial content for demo
-    const demoContent = [
-      ...generateMockContent('instagram', 3),
-      ...generateMockContent('tiktok', 2)
-    ];
-    
-    // Mark some as synced for demo
-    demoContent[0].status = 'synced';
-    demoContent[0].syncedAt = new Date().toISOString();
-    demoContent[1].status = 'processing';
-    
-    appData.content = demoContent;
-    updateStats();
-    
-    console.log(`✨ Demo data loaded: ${demoContent.length} content items`);
+    app.listen(PORT, () => {
+      console.log(`🚀 Creator Bridge API Server is running on port ${PORT}`);
+      console.log(`📊 Dashboard: http://localhost:${PORT}`);
+      console.log(`🔗 API Endpoints: http://localhost:${PORT}/api/`);
+      console.log(`🔥 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`📸 Instagram OAuth: http://localhost:${PORT}/auth/instagram`);
+      
+      // Check API configuration
+      if (!process.env.INSTAGRAM_APP_ID) {
+        console.warn('⚠️  Instagram API not configured - set INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET');
+      }
+      
+      if (!process.env.JW_PLAYER_API_KEY) {
+        console.warn('⚠️  JW Player API not configured - set JW_PLAYER_API_KEY and JW_PLAYER_API_SECRET');
+      }
+      
+      console.log('✨ Ready for real Instagram → JW Player content migration!');
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error.message);
+    process.exit(1);
   }
-});
+};
+
+startServer();
