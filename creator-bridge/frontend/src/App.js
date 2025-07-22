@@ -91,60 +91,60 @@ function App() {
   const handleConnectPlatform = async (platformId, credentials) => {
     setIsLoading(true);
     
-    // Simulate OAuth flow
-    console.log(`Connecting to ${platformId} with credentials:`, credentials);
-    
-    // Mock successful connection
-    setTimeout(() => {
-      setPlatforms(prev => prev.map(platform => 
-        platform.id === platformId 
-          ? { 
-              ...platform, 
-              connected: true, 
-              username: credentials.username || `@${platformId}_user`,
-              autoSync: true
-            }
-          : platform
-      ));
-      
-      setStats(prev => ({
-        ...prev,
-        platforms: prev.platforms + 1
-      }));
-      
+    try {
+      if (platformId === 'instagram') {
+        // Redirect to real Instagram OAuth
+        window.location.href = '/auth/instagram';
+      } else {
+        // For other platforms, show not implemented message
+        alert(`${platformId} integration coming soon! Instagram is currently supported.`);
+        setIsLoading(false);
+        setShowConnectModal(false);
+        setSelectedPlatform(null);
+      }
+    } catch (error) {
+      console.error('Connection error:', error);
+      alert('Failed to connect to platform. Please try again.');
+      setIsLoading(false);
       setShowConnectModal(false);
       setSelectedPlatform(null);
-      setIsLoading(false);
-      
-      // Simulate content import
-      importContent(platformId);
-    }, 2000);
+    }
   };
 
   // Import content from platform
   const importContent = async (platformId) => {
-    console.log(`Importing content from ${platformId}...`);
+    setIsLoading(true);
     
-    // Mock content import
-    const mockContent = [
-      {
-        id: `${platformId}_${Date.now()}`,
-        platform: platformId,
-        title: `Amazing ${platformId} video`,
-        description: 'This is a sample video imported from social media',
-        thumbnail: `https://picsum.photos/300/200?random=${Date.now()}`,
-        status: 'imported',
-        views: Math.floor(Math.random() * 10000),
-        likes: Math.floor(Math.random() * 1000),
-        createdAt: new Date().toISOString()
+    try {
+      console.log(`Importing content from ${platformId}...`);
+      
+      const response = await callBackendAPI(`/content/import/${platformId}`, 'POST', { count: 5 });
+      
+      if (response && response.success) {
+        // Add imported content to library
+        setContentLibrary(prev => [...prev, ...response.content]);
+        
+        // Update stats
+        if (response.stats) {
+          setStats(response.stats);
+        }
+        
+        alert(`Successfully imported ${response.content.length} videos from ${platformId}!`);
+      } else {
+        throw new Error(response?.message || 'Import failed');
       }
-    ];
-    
-    setContentLibrary(prev => [...prev, ...mockContent]);
-    setStats(prev => ({
-      ...prev,
-      totalContent: prev.totalContent + mockContent.length
-    }));
+      
+    } catch (error) {
+      console.error('Import error:', error);
+      
+      if (error.message.includes('not connected')) {
+        alert('Platform not connected. Please connect your account first.');
+      } else {
+        alert(`Failed to import content: ${error.message}`);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Toggle auto-sync
