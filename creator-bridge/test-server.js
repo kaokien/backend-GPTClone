@@ -91,7 +91,7 @@ const server = http.createServer((req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5004;
 
 server.listen(PORT, () => {
   console.log(`🚀 Creator Bridge Test Server running on port ${PORT}`);
