@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Content Bridge - Dashboard Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-xl font-bold text-gray-900">🌉 Creator Bridge</h1>
+                    </div>
+                    <div class="hidden md:ml-8 md:flex md:space-x-8">
+                        <a href="#" class="text-blue-600 border-b-2 border-blue-600 px-1 pt-1 text-sm font-medium">Dashboard</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Platforms</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Content</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Sync</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+                        Connect Platform
+                    </button>
+                    <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-blue-100 rounded-lg">
+                        <i data-lucide="video" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Content</p>
+                        <p class="text-2xl font-bold text-gray-900">156</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-green-100 rounded-lg">
+                        <i data-lucide="check-circle" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Synced</p>
+                        <p class="text-2xl font-bold text-gray-900">89</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-yellow-100 rounded-lg">
+                        <i data-lucide="clock" class="w-6 h-6 text-yellow-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Processing</p>
+                        <p class="text-2xl font-bold text-gray-900">12</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-purple-100 rounded-lg">
+                        <i data-lucide="link" class="w-6 h-6 text-purple-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Platforms</p>
+                        <p class="text-2xl font-bold text-gray-900">3</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Platform Connections -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Connected Platforms</h2>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 border rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                                <i data-lucide="instagram" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-medium text-gray-900">@creative_agency</p>
+                                <p class="text-sm text-gray-500">Instagram • Connected</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Auto-sync ON</span>
+                            <button class="text-gray-400 hover:text-gray-600">
+                                <i data-lucide="settings" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-4 border rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
+                                <span class="text-white font-bold text-lg">T</span>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-medium text-gray-900">@viral_content</p>
+                                <p class="text-sm text-gray-500">TikTok • Connected</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">Auto-sync OFF</span>
+                            <button class="text-gray-400 hover:text-gray-600">
+                                <i data-lucide="settings" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Library -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-lg font-medium text-gray-900">Content Library</h2>
+                <div class="flex space-x-2">
+                    <select class="border rounded-lg px-3 py-1 text-sm">
+                        <option>All Platforms</option>
+                        <option>Instagram</option>
+                        <option>TikTok</option>
+                    </select>
+                    <select class="border rounded-lg px-3 py-1 text-sm">
+                        <option>All Status</option>
+                        <option>Ready</option>
+                        <option>Synced</option>
+                        <option>Processing</option>
+                    </select>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Content Item 1 -->
+                    <div class="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                        <div class="relative">
+                            <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                                <i data-lucide="play" class="w-12 h-12 text-white"></i>
+                            </div>
+                            <div class="absolute top-2 left-2">
+                                <span class="px-2 py-1 text-xs font-medium bg-purple-600 text-white rounded">Instagram</span>
+                            </div>
+                            <div class="absolute top-2 right-2">
+                                <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Ready</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-medium text-gray-900 mb-2">Ultimate Marketing Tips for 2024</h3>
+                            <p class="text-sm text-gray-500 mb-3">Top 5 marketing tips that changed my business! #marketing #business</p>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span>1.5K likes • 89 comments</span>
+                                <button class="text-blue-600 hover:text-blue-700 font-medium">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Item 2 -->
+                    <div class="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                        <div class="relative">
+                            <div class="w-full h-48 bg-gradient-to-br from-pink-400 to-red-500 flex items-center justify-center">
+                                <i data-lucide="play" class="w-12 h-12 text-white"></i>
+                            </div>
+                            <div class="absolute top-2 left-2">
+                                <span class="px-2 py-1 text-xs font-medium bg-black text-white rounded">TikTok</span>
+                            </div>
+                            <div class="absolute top-2 right-2">
+                                <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">Synced</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-medium text-gray-900 mb-2">Viral Dance Tutorial</h3>
+                            <p class="text-sm text-gray-500 mb-3">Learn this trending dance! 💃 #dance #viral #tutorial</p>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span>25.6K likes • 432 comments</span>
+                                <span class="text-green-600 font-medium">✓ Synced to JW Player</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Item 3 -->
+                    <div class="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                        <div class="relative">
+                            <div class="w-full h-48 bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
+                                <i data-lucide="play" class="w-12 h-12 text-white"></i>
+                            </div>
+                            <div class="absolute top-2 left-2">
+                                <span class="px-2 py-1 text-xs font-medium bg-purple-600 text-white rounded">Instagram</span>
+                            </div>
+                            <div class="absolute top-2 right-2">
+                                <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded">Processing</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-medium text-gray-900 mb-2">Behind the Scenes</h3>
+                            <p class="text-sm text-gray-500 mb-3">How we create content for our clients 🎬 #bts #agency</p>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span>892 likes • 34 comments</span>
+                                <span class="text-yellow-600 font-medium">Processing...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast (Demo) -->
+    <div id="toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform">
+        <div class="flex items-center">
+            <i data-lucide="check" class="w-5 h-5 mr-2"></i>
+            Content successfully synced to JW Player!
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Demo toast notification
+        setTimeout(() => {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }, 2000);
+
+        // Add click handlers for demo
+        document.addEventListener('click', function(e) {
+            if (e.target.textContent === 'Edit') {
+                alert('This would open the metadata editor where you can:\n\n• Edit SEO-friendly titles\n• Enhance descriptions\n• Manage tags and hashtags\n• Upload custom thumbnails\n• Set sync destinations');
+            }
+            
+            if (e.target.textContent === 'Connect Platform') {
+                alert('This would start the OAuth flow for:\n\n• Instagram (Reels)\n• TikTok (Videos)\n• YouTube (Coming soon)\n\nSecurely connecting your social accounts to import content.');
+            }
+        });
+
+        // Add some dynamic behavior
+        const stats = document.querySelectorAll('.text-2xl');
+        stats.forEach(stat => {
+            const value = parseInt(stat.textContent);
+            let current = 0;
+            const increment = value / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= value) {
+                    stat.textContent = value;
+                    clearInterval(timer);
+                } else {
+                    stat.textContent = Math.floor(current);
+                }
+            }, 20);
+        });
+    </script>
+</body>
+</html>
