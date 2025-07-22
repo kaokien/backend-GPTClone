@@ -62,16 +62,16 @@ The server will run on http://localhost:5000
 📡 Test these endpoints in a new terminal:
 
 # Health Check
-curl http://localhost:5000/
+curl http://localhost:5004/
 
 # Platform Connections
-curl http://localhost:5000/api/platforms/
+curl http://localhost:5004/api/platforms/
 
 # Content Management
-curl http://localhost:5000/api/content/
+curl http://localhost:5004/api/content/
 
 # Authentication (POST)
-curl -X POST http://localhost:5000/api/auth/login \\
+curl -X POST http://localhost:5004/api/auth/login \\
   -H "Content-Type: application/json" \\
   -d '{"email": "demo@example.com", "password": "demo123"}'
 
